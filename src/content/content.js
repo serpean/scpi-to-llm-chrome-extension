@@ -2,7 +2,7 @@ import { downloadBytes } from "../core/download.js";
 import { transformScpiArchive } from "../core/transform.js";
 
 (function () {
-  const DEBUG = true;
+  const DEBUG = false;
   const BRIDGE_ID = "scpi-to-llm-page-bridge";
   const STYLE_ID = "scpi-to-llm-inline-style";
   const STATUS_ID = "scpi-to-llm-status";
@@ -746,16 +746,9 @@ import { transformScpiArchive } from "../core/transform.js";
   }
 
   function debugLog(message, payload) {
-    if (!DEBUG) {
-      return;
-    }
-
-    if (payload === undefined) {
-      console.debug("[SCPI to LLM]", message);
-      return;
-    }
-
-    console.debug("[SCPI to LLM]", message, payload);
+    void message;
+    void payload;
+    void DEBUG;
   }
 
   function truncate(value, maxLength) {

@@ -1,19 +1,21 @@
 # SCPI to LLM
 
-Chrome extension for downloading a SAP Cloud Integration artifact and converting it into a bundle that is easier to consume with an LLM.
+Chrome extension for downloading a SAP Cloud Integration artifact and converting it into a single text file that is easier to consume with an LLM.
+
+## Output
+
+Each export generates a `*-llm-ready.txt` file with:
+
+- a short functional summary of the Integration Flow
+- a JSON section with the parsed flow metadata
+- the textual source files concatenated with clear file boundaries
 
 ## Approach
 
 The extension supports two paths:
 
-1. Direct download from the active tenant through the design-time endpoint `IntegrationDesigntimeArtifacts(...)/$value`, triggered from the page itself so it can reuse the current session.
+1. Direct download from the active SAP tenant, triggered from the page so it can reuse the current session.
 2. Manual fallback by importing a ZIP exported from SCPI if SAP changes the endpoint, the DOM, or the session no longer allows the direct request.
-
-The output is a `*-llm-ready.zip` file containing:
-
-- `README.md` with a functional summary of the flow.
-- `summary/flow.json` with metadata, parameters, adapters, and BPMN steps.
-- `source/...` with the artifact text files normalized and, when applicable, formatted.
 
 ## Development
 
@@ -22,9 +24,9 @@ npm install
 npm run build
 ```
 
-The build outputs the extension into `dist/`.
+The build output is written to `dist/`.
 
-## Load in Chrome
+## Load In Chrome
 
 1. Open `chrome://extensions`.
 2. Enable `Developer mode`.
@@ -34,20 +36,13 @@ The build outputs the extension into `dist/`.
 ## Usage
 
 1. Open your SAP Integration Suite tenant in Chrome.
-2. Navigate to the artifact view of the content package.
-3. If you want to enable the operational popup locally, set the debug flag in the extension popup console:
+2. Navigate to the content package detail page where the Integration Flows are listed.
+3. Open the `Actions` menu of a flow.
+4. Click `To LLM`.
 
-```js
-localStorage.setItem("scpi-to-llm:popup-debug", "1");
-```
+If the direct download fails, use the popup fallback and import the ZIP exported from SAP manually.
 
-4. Open the extension popup.
-5. Select the detected Integration Flow.
-6. Click `Download for LLM`.
-
-If the direct download fails, use `Manual fallback` with the ZIP exported from SAP.
-
-## Local test
+## Local Test
 
 With the sample ZIP present in `example/`:
 
@@ -55,8 +50,12 @@ With the sample ZIP present in `example/`:
 npm test
 ```
 
-## Current limitations
+## Privacy
 
-- Artifact detection in the SAP table relies on the visible DOM; if SAP changes the UI significantly, row detection may stop working correctly.
-- The direct download assumes the tenant allows `GET /api/v1/IntegrationDesigntimeArtifacts(Id='...',Version='...')/$value` with the current session already open.
+A store-ready privacy policy draft is available at [PRIVACY_POLICY.md](/Users/serpean/m/scpi-to-llm/PRIVACY_POLICY.md).
+
+## Current Limitations
+
+- Artifact detection in the SAP table relies on the visible DOM. If SAP changes the UI significantly, row detection may stop working correctly.
+- The direct download path depends on the authenticated SAP session already being open in the browser.
 - The parser summarizes BPMN, adapters, mappings, and scripts, but it does not semantically interpret the internal content of each `.mmap`.

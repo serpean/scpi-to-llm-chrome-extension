@@ -11,6 +11,7 @@ await rm(distDir, { force: true, recursive: true });
 await mkdir(distDir, { recursive: true });
 await mkdir(path.join(distDir, "popup"), { recursive: true });
 await mkdir(path.join(distDir, "content"), { recursive: true });
+await mkdir(path.join(distDir, "icons"), { recursive: true });
 
 await Promise.all([
   esbuild.build({
@@ -38,6 +39,7 @@ await Promise.all([
     target: "chrome120"
   }),
   cp(path.join(root, "src/manifest.json"), path.join(distDir, "manifest.json")),
+  cp(path.join(root, "src/assets/icons"), path.join(distDir, "icons"), { recursive: true }),
   cp(path.join(root, "src/popup/index.html"), path.join(distDir, "popup/index.html")),
   cp(path.join(root, "src/popup/styles.css"), path.join(distDir, "popup/styles.css"))
 ]);

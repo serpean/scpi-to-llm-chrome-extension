@@ -1,9 +1,6 @@
 import { downloadBytes } from "../core/download.js";
 import { transformScpiArchive } from "../core/transform.js";
 
-const DEBUG_FLAG_KEY = "scpi-to-llm:popup-debug";
-const DEBUG_QUERY_PARAM = "debug";
-
 const elements = {
   infoPanel: document.getElementById("infoPanel"),
   debugPanel: document.getElementById("debugPanel"),
@@ -23,7 +20,7 @@ let currentContext = null;
 let selectedArtifactKey = "";
 let recentCandidateActivity = [];
 
-const debugEnabled = isDebugPopupEnabled();
+const debugEnabled = false;
 
 applyPopupMode(debugEnabled);
 
@@ -41,19 +38,6 @@ function applyPopupMode(enabled) {
   elements.infoPanel.hidden = enabled;
   elements.debugPanel.hidden = !enabled;
   document.body.classList.toggle("is-debug", enabled);
-}
-
-function isDebugPopupEnabled() {
-  const debugQueryValue = new URLSearchParams(window.location.search).get(DEBUG_QUERY_PARAM);
-  if (debugQueryValue && /^(1|true|yes|on)$/i.test(debugQueryValue)) {
-    return true;
-  }
-
-  try {
-    return window.localStorage.getItem(DEBUG_FLAG_KEY) === "1";
-  } catch {
-    return false;
-  }
 }
 
 async function refreshContext() {

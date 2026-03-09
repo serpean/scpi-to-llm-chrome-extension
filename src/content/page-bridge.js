@@ -651,21 +651,7 @@
   }
 
   function buildDetailedError(error) {
-    const base = error instanceof Error ? error.message : String(error);
-    const debug = (window.__scpiToLlmDebug || []).slice(0, 4);
-    if (!debug.length) {
-      return base;
-    }
-
-    return [
-      base,
-      "",
-      "debug:",
-      ...debug.map(
-        (entry) =>
-          `${entry.label} ${entry.status} ${entry.url}\n${entry.snippet}`
-      )
-    ].join("\n\n");
+    return error instanceof Error ? error.message : String(error);
   }
 
   function toAbsoluteUrl(url) {

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title>SCPI to LLM</title>
+  <desc>Extension icon for exporting SAP Cloud Integration flows into LLM-ready text.</desc>
+  <defs>
+    <linearGradient id="bg" x1="16" y1="12" x2="112" y2="116" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0b5cab"/>
+      <stop offset="1" stop-color="#083b6f"/>
+    </linearGradient>
+    <linearGradient id="page" x1="38" y1="26" x2="92" y2="102" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fefefe"/>
+      <stop offset="1" stop-color="#d8e6f5"/>
+    </linearGradient>
+  </defs>
+  <rect x="10" y="10" width="108" height="108" rx="24" fill="url(#bg)"/>
+  <path d="M39 27h34l16 16v58a7 7 0 0 1-7 7H39a7 7 0 0 1-7-7V34a7 7 0 0 1 7-7Z" fill="url(#page)"/>
+  <path d="M73 27v16h16" fill="#c3d9ef"/>
+  <path d="M73 27v16h16" fill="none" stroke="#8ab1d9" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M44 53h34M44 67h41M44 81h23" fill="none" stroke="#0b5cab" stroke-linecap="round" stroke-width="6"/>
+  <path d="M66 89l12 10 18-24" fill="none" stroke="#18a26b" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"/>
+</svg>
