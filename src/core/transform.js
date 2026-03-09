@@ -73,7 +73,7 @@ export async function transformScpiArchive(arrayBuffer, source = {}) {
   };
 
   const summaryMarkdown = buildSummaryMarkdown(summary, textEntries);
-  const outputZip = await buildOutputZip({
+  const llmText = buildLlmReadyText({
     artifactName,
     summary,
     summaryMarkdown,
@@ -84,7 +84,7 @@ export async function transformScpiArchive(arrayBuffer, source = {}) {
     artifactName,
     summary,
     summaryMarkdown,
-    outputZipBytes: outputZip
+    llmText
   };
 }
 
@@ -419,20 +419,38 @@ function buildInventory(entries) {
   return counters;
 }
 
-async function buildOutputZip({ artifactName, summary, summaryMarkdown, textEntries }) {
-  const zip = new JSZip();
-  zip.file("README.md", summaryMarkdown);
-  zip.file("summary/flow.json", JSON.stringify(summary, null, 2));
-
-  for (const entry of textEntries) {
-    zip.file(pathForOutput(entry.path), entry.prettyText + "\n");
-  }
-
-  return zip.generateAsync({ type: "uint8array", compression: "DEFLATE" });
-}
-
 function pathForOutput(filePath) {
   return `source/${filePath}`;
+}
+
+function buildLlmReadyText({ artifactName, summary, summaryMarkdown, textEntries }) {
+  const sections = [];
+
+  sections.push(`# SCPI TO LLM`);
+  sections.push("");
+  sections.push(`artifact: ${artifactName}`);
+  sections.push(`format: single-text-export`);
+  sections.push(`generated_sections: summary, flow_json, source_files`);
+  sections.push("");
+  sections.push(
+    "instructions_for_llm: this file contains the full SCPI artifact context. Use the summary first, then inspect the JSON, then the concatenated source files."
+  );
+
+  sections.push("\n===== SUMMARY =====\n");
+  sections.push(summaryMarkdown.trim());
+
+  sections.push("\n===== FLOW JSON =====\n");
+  sections.push(JSON.stringify(summary, null, 2));
+
+  sections.push("\n===== CONCATENATED SOURCE FILES =====\n");
+  for (const entry of textEntries) {
+    sections.push(`----- BEGIN FILE: ${pathForOutput(entry.path)} -----`);
+    sections.push(entry.prettyText);
+    sections.push(`----- END FILE: ${pathForOutput(entry.path)} -----`);
+    sections.push("");
+  }
+
+  return sections.join("\n").trimEnd() + "\n";
 }
 
 function buildSummaryMarkdown(summary, textEntries) {

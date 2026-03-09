@@ -160,9 +160,9 @@ async function handleManualZip(event) {
 async function convertAndDownload(bytes, source) {
   setStatus("Analizando el export SCPI y generando el bundle...");
   const result = await transformScpiArchive(bytes.buffer, source);
-  const filename = `${sanitizeFileName(result.artifactName)}-llm-ready.zip`;
-  downloadBytes(result.outputZipBytes, filename);
-  setStatus(`Bundle generado.\n\nArchivo: ${filename}\n\nREADME incluido: sí\nJSON de resumen: sí\nFuentes normalizadas: sí`);
+  const filename = `${sanitizeFileName(result.artifactName)}-llm-ready.txt`;
+  downloadBytes(new TextEncoder().encode(result.llmText), filename, "text/plain;charset=utf-8");
+  setStatus(`Export generado.\n\nArchivo: ${filename}\n\nFormato: texto único\nResumen incluido: sí\nJSON de resumen: sí\nFuentes concatenadas: sí`);
 }
 
 async function refreshActivity({ silent = false } = {}) {
