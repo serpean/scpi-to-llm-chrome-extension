@@ -1,7 +1,12 @@
 import { downloadBytes } from "../core/download.js";
 import { transformScpiArchive } from "../core/transform.js";
 
+const DEBUG_FLAG_KEY = "scpi-to-llm:popup-debug";
+const DEBUG_QUERY_PARAM = "debug";
+
 const elements = {
+  infoPanel: document.getElementById("infoPanel"),
+  debugPanel: document.getElementById("debugPanel"),
   pageMeta: document.getElementById("pageMeta"),
   artifactList: document.getElementById("artifactList"),
   downloadButton: document.getElementById("downloadButton"),
@@ -18,19 +23,44 @@ let currentContext = null;
 let selectedArtifactKey = "";
 let recentCandidateActivity = [];
 
-elements.refreshButton.addEventListener("click", () => void refreshContext());
-elements.activityButton.addEventListener("click", () => void refreshActivity());
-elements.downloadButton.addEventListener("click", () => void handleDirectDownload());
-elements.retryCapturedButton.addEventListener("click", () => void handleRetryCapturedUrl());
-elements.zipInput.addEventListener("change", (event) => void handleManualZip(event));
+const debugEnabled = isDebugPopupEnabled();
 
-await refreshContext();
+applyPopupMode(debugEnabled);
+
+if (debugEnabled) {
+  elements.refreshButton.addEventListener("click", () => void refreshContext());
+  elements.activityButton.addEventListener("click", () => void refreshActivity());
+  elements.downloadButton.addEventListener("click", () => void handleDirectDownload());
+  elements.retryCapturedButton.addEventListener("click", () => void handleRetryCapturedUrl());
+  elements.zipInput.addEventListener("change", (event) => void handleManualZip(event));
+
+  await refreshContext();
+}
+
+function applyPopupMode(enabled) {
+  elements.infoPanel.hidden = enabled;
+  elements.debugPanel.hidden = !enabled;
+  document.body.classList.toggle("is-debug", enabled);
+}
+
+function isDebugPopupEnabled() {
+  const debugQueryValue = new URLSearchParams(window.location.search).get(DEBUG_QUERY_PARAM);
+  if (debugQueryValue && /^(1|true|yes|on)$/i.test(debugQueryValue)) {
+    return true;
+  }
+
+  try {
+    return window.localStorage.getItem(DEBUG_FLAG_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
 
 async function refreshContext() {
-  setStatus("Leyendo la pestaña activa...");
+  setStatus("Reading the active tab...");
   currentTab = await getActiveTab();
   if (!currentTab?.id) {
-    setStatus("No he podido identificar la pestaña activa.");
+    setStatus("Could not identify the active tab.");
     return;
   }
 
@@ -39,7 +69,7 @@ async function refreshContext() {
   } catch (error) {
     currentContext = null;
     setStatus(
-      "La pestaña activa no parece ser un tenant compatible de SAP o la página aún no terminó de cargar."
+      "The active tab does not appear to be a compatible SAP tenant, or the page has not finished loading yet."
     );
     renderArtifacts([]);
     return;
@@ -51,21 +81,21 @@ async function refreshContext() {
   await refreshActivity({ silent: true });
   setStatus(
     currentContext.artifacts?.length
-      ? "Selecciona un artifact y lanza la descarga llm-ready."
-      : "No he detectado artifacts visibles en la página. Puedes usar el ZIP manual."
+      ? "Select an artifact and start the LLM-ready download."
+      : "No visible artifacts were detected on the page. You can use the manual ZIP fallback."
   );
 }
 
 async function handleDirectDownload() {
   const artifact = getSelectedArtifact();
   if (!artifact || !currentTab?.id) {
-    setStatus("No hay ningún artifact seleccionado.");
+    setStatus("No artifact is currently selected.");
     return;
   }
 
   try {
     elements.downloadButton.disabled = true;
-    setStatus(`Descargando ${artifact.name} ${artifact.version || ""} desde SAP...`);
+    setStatus(`Downloading ${artifact.name} ${artifact.version || ""} from SAP...`);
     const result = await chrome.tabs.sendMessage(currentTab.id, {
       type: "FETCH_ARTIFACT_ZIP",
       payload: {
@@ -76,7 +106,7 @@ async function handleDirectDownload() {
     });
 
     if (!result?.ok) {
-      throw new Error(result?.error || "No se pudo descargar el artifact");
+      throw new Error(result?.error || "Could not download the artifact");
     }
 
     await refreshActivity({ silent: true });
@@ -91,13 +121,13 @@ async function handleDirectDownload() {
     await refreshActivity({ silent: true });
     setStatus(
       [
-        "Fallo en descarga directa.",
+        "Direct download failed.",
         "",
         error instanceof Error ? error.message : String(error),
         "",
         recentCandidateActivity.length
-          ? "He capturado tráfico reciente abajo. Haz la descarga nativa en SAP y prueba 'Retry captured URL'."
-          : "Todavía no hay tráfico útil capturado. Haz la descarga nativa en SAP y luego pulsa 'Ver tráfico'."
+          ? "Recent traffic was captured below. Run the native SAP download and try 'Retry captured URL'."
+          : "No useful traffic has been captured yet. Run the native SAP download and then click 'View traffic'."
       ].join("\n")
     );
   } finally {
@@ -108,12 +138,12 @@ async function handleDirectDownload() {
 async function handleRetryCapturedUrl() {
   const latest = recentCandidateActivity[0];
   if (!latest || !currentTab?.id) {
-    setStatus("No hay ninguna URL capturada para reintentar.");
+    setStatus("There is no captured URL available to retry.");
     return;
   }
 
   try {
-    setStatus(`Reintentando la última URL capturada...\n${latest.url}`);
+    setStatus(`Retrying the latest captured URL...\n${latest.url}`);
     const result = await chrome.tabs.sendMessage(currentTab.id, {
       type: "FETCH_ARTIFACT_BY_URL",
       payload: {
@@ -123,7 +153,7 @@ async function handleRetryCapturedUrl() {
     });
 
     if (!result?.ok) {
-      throw new Error(result?.error || "No se pudo descargar usando la URL capturada");
+      throw new Error(result?.error || "Could not download using the captured URL");
     }
 
     await convertAndDownload(base64ToBytes(result.dataBase64), {
@@ -145,7 +175,7 @@ async function handleManualZip(event) {
   }
 
   try {
-    setStatus(`Convirtiendo ZIP local: ${file.name}`);
+    setStatus(`Converting local ZIP: ${file.name}`);
     const buffer = await file.arrayBuffer();
     await convertAndDownload(new Uint8Array(buffer), {
       artifactId: file.name.replace(/\.zip$/i, "")
@@ -158,11 +188,19 @@ async function handleManualZip(event) {
 }
 
 async function convertAndDownload(bytes, source) {
-  setStatus("Analizando el export SCPI y generando el bundle...");
+  setStatus("Analyzing the SCPI export and generating the bundle...");
   const result = await transformScpiArchive(bytes.buffer, source);
   const filename = `${sanitizeFileName(result.artifactName)}-llm-ready.txt`;
-  downloadBytes(new TextEncoder().encode(result.llmText), filename, "text/plain;charset=utf-8");
-  setStatus(`Export generado.\n\nArchivo: ${filename}\n\nFormato: texto único\nResumen incluido: sí\nJSON de resumen: sí\nFuentes concatenadas: sí`);
+  const downloadId = await downloadBytes(
+    new TextEncoder().encode(result.llmText),
+    filename,
+    "text/plain;charset=utf-8"
+  );
+  setStatus(
+    `Export generated.\n\nFile: ${filename}\n\nFormat: single text file\nSummary included: yes\nSummary JSON: yes\nConcatenated sources: yes${
+      downloadId ? `\nDownload ID: ${downloadId}` : ""
+    }`
+  );
 }
 
 async function refreshActivity({ silent = false } = {}) {
@@ -175,10 +213,10 @@ async function refreshActivity({ silent = false } = {}) {
     recentCandidateActivity = extractCandidateActivity(response?.activity || []);
     renderActivity(recentCandidateActivity);
     if (!silent && recentCandidateActivity.length) {
-      setStatus("Tráfico SAP actualizado. Revisa las URLs capturadas.");
+      setStatus("SAP traffic updated. Review the captured URLs.");
     }
     if (!silent && !recentCandidateActivity.length) {
-      setStatus("No hay tráfico SAP relevante aún. Haz la descarga nativa en SAP y vuelve a pulsar 'Ver tráfico'.");
+      setStatus("No relevant SAP traffic yet. Run the native SAP download and then click 'View traffic' again.");
     }
   } catch (error) {
     recentCandidateActivity = [];
@@ -215,7 +253,7 @@ function renderArtifacts(artifacts) {
       <span class="artifact-meta">${escapeHtml(artifact.version || "Version not detected")} · ${escapeHtml(
         artifact.type || "Artifact"
       )}</span>
-      <span class="artifact-meta">${escapeHtml(artifact.description || "Sin descripción visible")}</span>
+      <span class="artifact-meta">${escapeHtml(artifact.description || "No visible description")}</span>
     `;
     elements.artifactList.appendChild(card);
   }
@@ -231,8 +269,8 @@ function renderActivity(items) {
     const empty = document.createElement("div");
     empty.className = "activity-card";
     empty.innerHTML = `
-      <span class="activity-meta">Sin actividad capturada todavía.</span>
-      <span class="activity-meta">Pulsa Download en SAP y luego vuelve a abrir este popup.</span>
+      <span class="activity-meta">No activity has been captured yet.</span>
+      <span class="activity-meta">Click Download in SAP and then reopen this popup.</span>
     `;
     elements.activityList.appendChild(empty);
     return;
@@ -300,7 +338,7 @@ function guessFilenameFromUrl(url) {
 
 function base64ToBytes(base64) {
   if (!base64) {
-    throw new Error("El ZIP descargado llegó vacío a la extensión.");
+    throw new Error("The downloaded ZIP arrived empty in the extension.");
   }
 
   const binary = atob(base64);

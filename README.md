@@ -1,56 +1,62 @@
 # SCPI to LLM
 
-Extensión de Chrome para descargar un artifact de SAP Cloud Integration y convertirlo a un bundle más cómodo para una LLM.
+Chrome extension for downloading a SAP Cloud Integration artifact and converting it into a bundle that is easier to consume with an LLM.
 
-## Enfoque
+## Approach
 
-La extensión usa dos vías:
+The extension supports two paths:
 
-1. Descarga directa desde el tenant activo mediante el endpoint de design-time `IntegrationDesigntimeArtifacts(...)/$value`, lanzado desde la propia página para reutilizar la sesión abierta.
-2. Fallback manual importando un ZIP exportado desde SCPI si SAP cambia el endpoint, el DOM o la sesión no deja hacer la llamada directa.
+1. Direct download from the active tenant through the design-time endpoint `IntegrationDesigntimeArtifacts(...)/$value`, triggered from the page itself so it can reuse the current session.
+2. Manual fallback by importing a ZIP exported from SCPI if SAP changes the endpoint, the DOM, or the session no longer allows the direct request.
 
-La salida es un ZIP `*-llm-ready.zip` con:
+The output is a `*-llm-ready.zip` file containing:
 
-- `README.md` con resumen funcional del flow.
-- `summary/flow.json` con metadatos, parámetros, adapters y pasos BPMN.
-- `source/...` con los ficheros textuales del artifact normalizados y, cuando aplica, formateados.
+- `README.md` with a functional summary of the flow.
+- `summary/flow.json` with metadata, parameters, adapters, and BPMN steps.
+- `source/...` with the artifact text files normalized and, when applicable, formatted.
 
-## Desarrollo
+## Development
 
 ```bash
 npm install
 npm run build
 ```
 
-El build genera la extensión en `dist/`.
+The build outputs the extension into `dist/`.
 
-## Cargar en Chrome
+## Load in Chrome
 
-1. Abre `chrome://extensions`.
-2. Activa `Developer mode`.
-3. Pulsa `Load unpacked`.
-4. Selecciona `/Users/serpean/m/scpi-to-llm/dist`.
+1. Open `chrome://extensions`.
+2. Enable `Developer mode`.
+3. Click `Load unpacked`.
+4. Select `/Users/serpean/m/scpi-to-llm/dist`.
 
-## Uso
+## Usage
 
-1. Abre tu tenant de SAP Integration Suite en Chrome.
-2. Sitúate en la vista de artifacts del content package.
-3. Abre el popup de la extensión.
-4. Selecciona el Integration Flow detectado.
-5. Pulsa `Download for LLM`.
+1. Open your SAP Integration Suite tenant in Chrome.
+2. Navigate to the artifact view of the content package.
+3. If you want to enable the operational popup locally, set the debug flag in the extension popup console:
 
-Si la descarga directa falla, usa `Fallback manual` con el ZIP exportado desde SAP.
+```js
+localStorage.setItem("scpi-to-llm:popup-debug", "1");
+```
 
-## Test local
+4. Open the extension popup.
+5. Select the detected Integration Flow.
+6. Click `Download for LLM`.
 
-Con el ZIP de ejemplo presente en `example/`:
+If the direct download fails, use `Manual fallback` with the ZIP exported from SAP.
+
+## Local test
+
+With the sample ZIP present in `example/`:
 
 ```bash
 npm test
 ```
 
-## Limitaciones actuales
+## Current limitations
 
-- La detección de artifacts en la tabla de SAP se basa en el DOM visible; si SAP cambia mucho la UI puede dejar de listar bien los rows.
-- La descarga directa asume que el tenant permite `GET /api/v1/IntegrationDesigntimeArtifacts(Id='...',Version='...')/$value` con la sesión ya abierta.
-- El parser resume BPMN, adapters, mappings y scripts, pero no interpreta semánticamente el contenido interno de cada `.mmap`.
+- Artifact detection in the SAP table relies on the visible DOM; if SAP changes the UI significantly, row detection may stop working correctly.
+- The direct download assumes the tenant allows `GET /api/v1/IntegrationDesigntimeArtifacts(Id='...',Version='...')/$value` with the current session already open.
+- The parser summarizes BPMN, adapters, mappings, and scripts, but it does not semantically interpret the internal content of each `.mmap`.
