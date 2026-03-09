@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "SCPI to LLM",
+  "version": "0.1.0",
+  "description": "Download SAP Cloud Integration flows and convert them into an LLM-ready bundle.",
+  "permissions": ["activeTab", "downloads"],
+  "host_permissions": ["https://*.hana.ondemand.com/*"],
+  "action": {
+    "default_popup": "popup/index.html",
+    "default_title": "SCPI to LLM"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.hana.ondemand.com/*"],
+      "js": ["content/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["content/page-bridge.js"],
+      "matches": ["https://*.hana.ondemand.com/*"]
+    }
+  ]
+}

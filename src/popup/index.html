@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SCPI to LLM</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="hero">
+        <p class="eyebrow">SAP Cloud Integration</p>
+        <h1>SCPI to LLM</h1>
+        <p class="subtitle">Descarga el artifact del tenant activo y genera un bundle listo para una LLM.</p>
+      </header>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Tenant actual</h2>
+          <button id="refreshButton" class="ghost">Refresh</button>
+        </div>
+        <p id="pageMeta" class="muted">Buscando contexto de la pestaña activa...</p>
+        <div id="artifactList" class="artifact-list"></div>
+        <button id="downloadButton" class="primary" disabled>Download for LLM</button>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Diagnóstico</h2>
+          <button id="activityButton" class="ghost">Ver tráfico</button>
+        </div>
+        <p class="muted">Haz la descarga nativa en SAP y vuelve aquí para ver las URLs reales que ha usado la página.</p>
+        <div id="activityList" class="activity-list"></div>
+        <button id="retryCapturedButton" class="ghost" disabled>Retry captured URL</button>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Fallback manual</h2>
+        </div>
+        <label class="file-drop" for="zipInput">
+          <input id="zipInput" type="file" accept=".zip" />
+          <span>Importa un ZIP exportado desde SCPI</span>
+        </label>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Status</h2>
+        </div>
+        <pre id="statusBox" class="status">Listo.</pre>
+      </section>
+    </main>
+    <script type="module" src="./popup.js"></script>
+  </body>
+</html>
