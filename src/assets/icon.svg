@@ -1,20 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
   <title>SCPI to LLM</title>
-  <desc>Extension icon for exporting SAP Cloud Integration flows into LLM-ready text.</desc>
-  <defs>
-    <linearGradient id="bg" x1="16" y1="12" x2="112" y2="116" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#0b5cab"/>
-      <stop offset="1" stop-color="#083b6f"/>
-    </linearGradient>
-    <linearGradient id="page" x1="38" y1="26" x2="92" y2="102" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#fefefe"/>
-      <stop offset="1" stop-color="#d8e6f5"/>
-    </linearGradient>
-  </defs>
-  <rect x="10" y="10" width="108" height="108" rx="24" fill="url(#bg)"/>
-  <path d="M39 27h34l16 16v58a7 7 0 0 1-7 7H39a7 7 0 0 1-7-7V34a7 7 0 0 1 7-7Z" fill="url(#page)"/>
-  <path d="M73 27v16h16" fill="#c3d9ef"/>
-  <path d="M73 27v16h16" fill="none" stroke="#8ab1d9" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M44 53h34M44 67h41M44 81h23" fill="none" stroke="#0b5cab" stroke-linecap="round" stroke-width="6"/>
-  <path d="M66 89l12 10 18-24" fill="none" stroke="#18a26b" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"/>
+  <desc>Extension icon for exporting SAP Cloud Integration flows into a single LLM-ready text file.</desc>
+
+  <rect x="10" y="10" width="108" height="108" rx="26" fill="#0f6fc6"/>
+  <rect x="18" y="18" width="92" height="92" rx="20" fill="#0b4d8d"/>
+
+  <path d="M39 24h34l18 18v48c0 7.73-6.27 14-14 14H39c-7.73 0-14-6.27-14-14V38c0-7.73 6.27-14 14-14Z" fill="#ffffff"/>
+  <path d="M73 24v18h18" fill="#cfe3f7"/>
+
+  <circle cx="42" cy="58" r="6" fill="#0f6fc6"/>
+  <circle cx="42" cy="74" r="6" fill="#0f6fc6"/>
+  <circle cx="42" cy="90" r="6" fill="#0f6fc6"/>
+  <path d="M55 58h20M55 74h20M55 90h14" fill="none" stroke="#0f6fc6" stroke-linecap="round" stroke-width="7"/>
+
+  <circle cx="88" cy="88" r="18" fill="#14b57a"/>
+  <path d="M81 80l8 8-8 8" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="6"/>
+  <path d="M96 80l-8 8 8 8" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="6"/>
 </svg>

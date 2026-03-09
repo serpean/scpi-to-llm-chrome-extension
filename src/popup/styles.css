@@ -29,6 +29,11 @@ body {
   padding: 16px;
 }
 
+.app-info {
+  display: grid;
+  gap: 14px;
+}
+
 .sap-shell {
   position: relative;
   overflow: hidden;
@@ -80,6 +85,16 @@ body {
 
 .sap-copy {
   max-width: 32ch;
+}
+
+.info-card {
+  gap: 8px;
+}
+
+.info-card code {
+  font-family: "SFMono-Regular", "Menlo", monospace;
+  font-size: 12px;
+  color: var(--accent-strong);
 }
 
 .debug-panel {

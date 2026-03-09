@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SCPI to LLM Debug</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="is-debug">
+    <main class="app">
+      <header class="hero">
+        <p class="eyebrow">Debug mode</p>
+        <h2>Internal tools</h2>
+        <p class="subtitle">Inspect the active tenant, run direct downloads, and use the manual fallback.</p>
+      </header>
+
+      <div id="debugPanel" class="debug-panel">
+        <section class="panel">
+          <div class="panel-head">
+            <h3>Current tenant</h3>
+            <button id="refreshButton" class="ghost">Refresh</button>
+          </div>
+          <p id="pageMeta" class="muted">Reading context from the active tab...</p>
+          <div id="artifactList" class="artifact-list"></div>
+          <button id="downloadButton" class="primary" disabled>Download for LLM</button>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h3>Diagnostics</h3>
+            <button id="activityButton" class="ghost">View traffic</button>
+          </div>
+          <p class="muted">Run the native SAP download and return here to inspect the actual URLs used by the page.</p>
+          <div id="activityList" class="activity-list"></div>
+          <button id="retryCapturedButton" class="ghost" disabled>Retry captured URL</button>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h3>Manual fallback</h3>
+          </div>
+          <label class="file-drop" for="zipInput">
+            <input id="zipInput" type="file" accept=".zip" />
+            <span>Import a ZIP exported from SCPI</span>
+          </label>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h3>Status</h3>
+          </div>
+          <pre id="statusBox" class="status">Ready.</pre>
+        </section>
+      </div>
+
+      <section id="infoPanel" hidden></section>
+    </main>
+    <script type="module" src="./popup.js"></script>
+  </body>
+</html>

@@ -41,5 +41,6 @@ await Promise.all([
   cp(path.join(root, "src/manifest.json"), path.join(distDir, "manifest.json")),
   cp(path.join(root, "src/assets/icons"), path.join(distDir, "icons"), { recursive: true }),
   cp(path.join(root, "src/popup/index.html"), path.join(distDir, "popup/index.html")),
+  cp(path.join(root, "src/popup/debug.html"), path.join(distDir, "popup/debug.html")),
   cp(path.join(root, "src/popup/styles.css"), path.join(distDir, "popup/styles.css"))
 ]);
