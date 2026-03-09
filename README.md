@@ -52,7 +52,7 @@ npm test
 
 ## Privacy
 
-A store-ready privacy policy draft is available at [PRIVACY_POLICY.md](/Users/serpean/m/scpi-to-llm/PRIVACY_POLICY.md).
+A store-ready privacy policy draft is available at [PRIVACY_POLICY.md](./PRIVACY_POLICY.md).
 
 ## Current Limitations
 
